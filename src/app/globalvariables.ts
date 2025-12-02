@@ -28,4 +28,4 @@ export interface InventoryFormData {
   price: string;
 }
 
-export const BASE_URL = process.env["NEXT_API_SERVER"] || "http://localhost/smart_inventory_solution/";
+export const BASE_URL = process.env.NEXT_API_SERVER || "http://localhost/inventory_system_with_ai_agentic_backend/";

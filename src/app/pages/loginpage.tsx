@@ -1,8 +1,8 @@
 "use client"
 import React, { useState } from 'react';
 import { Package, ArrowLeft } from 'lucide-react';
-import {Input} from '../components/ui/Input';
-import {Button} from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import { loginUser } from '../services/post';
 import { useRouter } from 'next/navigation';
 import { User } from '../globalvariables';
@@ -32,10 +32,11 @@ export const LoginPage = () => {
           isAdmin: user.isAdmin
         }),
       })
-      console.log(response.json());
+      const responseData = await response.json();
+      console.log(responseData);
       route.push('/dashboard/home');
     } catch (err: any) {
-        setError('Login gagal. Periksa username dan password anda.');
+      setError('Login gagal. Periksa username dan password anda.');
     } finally {
       setIsLoading(false);
     }
@@ -52,11 +53,11 @@ export const LoginPage = () => {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200/30 rounded-full blur-3xl"></div>
 
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 relative z-10">
-        <button 
+        <button
           onClick={onBack}
           className="absolute top-6 left-6 text-slate-400 hover:text-slate-600 transition-colors"
         >
-             <ArrowLeft size={20} />
+          <ArrowLeft size={20} />
         </button>
 
         <div className="text-center mb-8">
@@ -91,7 +92,7 @@ export const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          
+
           <Button type="submit" className="w-full py-2.5" isLoading={isLoading}>
             Masuk Sekarang
           </Button>
