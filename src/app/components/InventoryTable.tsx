@@ -1,9 +1,17 @@
 "use client";
+import { useState } from 'react';
 import { InventoryItem } from '../globalvariables';
-import { Package, MoreHorizontal } from 'lucide-react';
+import { Package, MoreHorizontal, Check, X, Pencil, Trash } from 'lucide-react';
 
 interface InventoryTableProps {
   items: InventoryItem[];
+  onEdit: (item: InventoryItem) => void;
+  onDelete: (item: InventoryItem) => void;
+}
+
+interface HandleEdit {
+  onEdit: (item: InventoryItem) => void;
+  onDelete: (item: InventoryItem) => void;
 }
 
 const formatCurrency = (value: string) => {
@@ -32,7 +40,13 @@ const formatDate = (dateString: string) => {
   }
 };
 
-export const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
+export const InventoryTable = ({ items, onEdit, onDelete }: InventoryTableProps) => {
+  const [isActionOpen, setIsActionOpen] = useState(false);
+
+  const actionClicked = () => {
+    setIsActionOpen(true);
+  }
+
   if (items.length === 0) {
     return (
       <div className="text-center py-20 bg-white rounded-xl border border-slate-200">
@@ -93,9 +107,20 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
                   {formatDate(item.created_at)}
                 </td>
                  <td className="px-6 py-4 text-center">
-                   <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1 rounded hover:bg-indigo-50">
-                     <MoreHorizontal size={16} />
-                   </button>
+                  {isActionOpen ? (
+                    <div className="flex items-center gap-2">
+                      <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1 rounded hover:bg-indigo-50" onClick={() => onEdit(item)}>
+                        <Pencil size={16} />
+                      </button>
+                      <button className="text-slate-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50" onClick={() => onDelete(item)}>
+                        <Trash size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1 rounded hover:bg-indigo-50" onClick={actionClicked}>
+                      <MoreHorizontal size={16} />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

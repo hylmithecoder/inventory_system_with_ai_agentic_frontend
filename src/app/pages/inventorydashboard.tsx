@@ -1,20 +1,41 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, Package, TrendingUp, AlertCircle, RefreshCw, ShoppingCart } from 'lucide-react';
-import { InventoryItem, User } from '../globalvariables';
+import { LayoutDashboard, Package, TrendingUp, AlertCircle, RefreshCw, Plus } from 'lucide-react';
+import { InventoryFormData, InventoryItem, User } from '../globalvariables';
 import { fetchInventoryData, getUserAuth } from '../services/get';
 import {StatCard} from '../components/StatCard';
 import {InventoryTable} from '../components/InventoryTable';
 import {Sidebar} from '../components/SideBar';
 import { InventoryFormModal } from '../components/InventoryFormModal';
 import { useRouter } from 'next/navigation';
+import { Button } from '../components/ui/Button';
+import { addInventoryItem, updateInventoryItem } from '../services/post';
+import { deleteInventoryItem } from '../services/delete';
 
 export const InventoryDashboard = () => {    
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [userData, setUserData] = useState<User | null>(null);
+  const [userData, setUserData] = useState<User>({
+    ID: "",
+    username: "",
+    created_at: "",
+    isAdmin: "",
+    token: ""
+  });
   const router = useRouter();
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<InventoryItem>({
+      ID: "",
+      created_at: "",
+      name: "",
+      stock: "",
+      price: "",
+      created_by: ""
+    });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -34,7 +55,56 @@ export const InventoryDashboard = () => {
     setUserData(response.user);
     console.log(response.user);
   };
+
+  const emptyTheForm = async() => {
+    setEditingItem({
+      ID: "",
+      created_at: "",
+      name: "",
+      stock: "",
+      price: "",
+      created_by: ""
+    })
+  }
+
+  const handleAddItem = async() => {
+    emptyTheForm()
+    setIsModalOpen(true)
+  }
+
+  const handleFormSubmit = async(formData: InventoryFormData) => {
+    setIsSubmitting(true);
+    try {
+      if (editingItem.ID) {
+        await updateInventoryItem(editingItem.ID, formData, userData?.username || 'admin');
+      } else {
+        await addInventoryItem(formData, userData?.username || 'admin');
+      }
+      setIsModalOpen(false);
+      loadData(); // Refresh list
+    } catch (e) {
+      alert("Operasi gagal: " + e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   
+  const handleEditItem = async(item: InventoryItem) => {
+    console.log(item);
+    setEditingItem(item);
+    setIsModalOpen(true);
+  }
+
+  const handleDeleteItem = async(item: InventoryItem) => {
+    try {
+      const response = await deleteInventoryItem(item.ID);
+      console.log(response);
+      loadData(); // Refresh list
+    } catch (e) {
+      alert("Operasi gagal: " + e);
+    }
+  }
+
   useEffect(() => {
     getUser();
     loadData();
@@ -67,15 +137,23 @@ export const InventoryDashboard = () => {
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
-            <p className="text-slate-500 mt-1">Selamat datang kembali, berikut ringkasan stok hari ini.</p>
+            <p className="text-slate-500 mt-1">Halo {userData?.username}, berikut ringkasan stok hari ini.</p>
           </div>
-          <button 
+          <div className="flex items-center gap-3">
+          <Button 
+            variant="secondary" 
             onClick={loadData}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-sm font-medium transition-colors shadow-sm"
+            disabled={loading}
+            className="hidden sm:flex"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            Refresh Data
-          </button>
+            <RefreshCw size={16} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button onClick={handleAddItem}>
+            <Plus size={18} className="mr-2" />
+            Tambah Barang
+          </Button>
+          </div>
         </header>
         
         {/* Stats Row */}
@@ -84,7 +162,6 @@ export const InventoryDashboard = () => {
             title="Total Barang" 
             value={totalItems.toString()} 
             icon={Package} 
-            trend="+1 baru"
           />
           <StatCard 
             title="Total Stok Unit" 
@@ -127,10 +204,17 @@ export const InventoryDashboard = () => {
                <p className="text-sm">Memuat data inventory...</p>
             </div>
           ) : (
-            <InventoryTable items={items} />
+            <InventoryTable items={items} onEdit={handleEditItem} onDelete={handleDeleteItem}/>
           )}
         </section>
       </main>
+      <InventoryFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleFormSubmit}
+        initialData={editingItem}
+        isLoading={isSubmitting}
+        />
     </div>
   );
 };

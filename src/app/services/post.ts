@@ -15,7 +15,7 @@ export const postFormData = async (url: string, data: Record<string, any>) => {
 
 export const loginUser = async (username: string, password: string): Promise<User> => {
   try {
-    const response = await postFormData(`${BASE_URL}/accounts/`, {
+    const response = await postFormData(`${BASE_URL}accounts/`, {
       username,
       password,
       _method: 'POST' // explicitly stating for the PHP switch
@@ -33,7 +33,7 @@ export const loginUser = async (username: string, password: string): Promise<Use
 }
 
 export const addInventoryItem = async (item: InventoryFormData, createdBy: string): Promise<void> => {
-  const response = await postFormData(`${BASE_URL}/`, {
+  const response = await postFormData(`${BASE_URL}`, {
     ...item,
     created_by: createdBy,
     action: 'create' // Or however the PHP expects it, adding a flag usually helps
@@ -42,11 +42,12 @@ export const addInventoryItem = async (item: InventoryFormData, createdBy: strin
   if (response.status !== 'success') throw new Error(response.message || 'Failed to add item')
 }
 
-export const updateInventoryItem = async (id: string, item: InventoryFormData): Promise<void> => {
+export const updateInventoryItem = async (id: string, item: InventoryFormData, created_by: string): Promise<void> => {
   // Simulating PUT via POST
-  const response = await postFormData(`${BASE_URL}/`, {
+  const response = await postFormData(`${BASE_URL}`, {
     ...item,
     id: id,
+    created_by: created_by,
     _method: 'PUT'
   })
 

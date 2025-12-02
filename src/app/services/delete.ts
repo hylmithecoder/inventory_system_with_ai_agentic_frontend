@@ -2,7 +2,7 @@ import { ApiResponse, InventoryItem, User, InventoryFormData, BASE_URL } from '.
 import { postFormData } from './post';
 
 export const deleteInventoryItem = async (id: string): Promise<void> => {
-  const response = await postFormData(`${BASE_URL}/`, {
+  const response = await postFormData(`${BASE_URL}`, {
     id: id,
     _method: 'DELETE'
   });
