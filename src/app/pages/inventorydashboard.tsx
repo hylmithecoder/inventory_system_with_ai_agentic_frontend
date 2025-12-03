@@ -7,6 +7,7 @@ import { StatCard } from '../components/StatCard';
 import { InventoryTable } from '../components/InventoryTable';
 import { Sidebar } from '../components/SideBar';
 import { InventoryFormModal } from '../components/InventoryFormModal';
+import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
 import { ChatbotSidebar } from '../components/ChatbotSidebar';
 import { useRouter } from 'next/navigation';
 import { Button } from '../components/ui/Button';
@@ -37,6 +38,11 @@ export const InventoryDashboard = () => {
     created_by: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Delete Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -97,12 +103,22 @@ export const InventoryDashboard = () => {
   }
 
   const handleDeleteItem = async (item: InventoryItem) => {
+    setItemToDelete(item);
+    setIsDeleteModalOpen(true);
+  }
+
+  const handleDeleteConfirm = async (item: InventoryItem) => {
+    setIsDeleting(true);
     try {
       const response = await deleteInventoryItem(item.ID);
       console.log(response);
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
       loadData(); // Refresh list
     } catch (e) {
       alert("Operasi gagal: " + e);
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -211,6 +227,16 @@ export const InventoryDashboard = () => {
         onSubmit={handleFormSubmit}
         initialData={editingItem}
         isLoading={isSubmitting}
+      />
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        itemToDelete={itemToDelete}
+        isLoading={isDeleting}
       />
       <ChatbotSidebar />
     </div>
