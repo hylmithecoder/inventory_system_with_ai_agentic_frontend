@@ -20,6 +20,7 @@ export interface User {
   username: string;
   isAdmin: string;
   token?: string;
+  session_token: string;
 }
 
 export interface InventoryFormData {
@@ -28,4 +29,4 @@ export interface InventoryFormData {
   price: string;
 }
 
-export const BASE_URL = process.env.NEXT_API_SERVER || "http://localhost/inventory_system_with_ai_agentic_backend/";
+export const BASE_URL = process.env.NEXT_API_SERVER || "http://localhost/smart_inventory_solution/";

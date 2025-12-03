@@ -23,7 +23,8 @@ export const InventoryDashboard = () => {
     username: "",
     created_at: "",
     isAdmin: "",
-    token: ""
+    token: "",
+    session_token: ""
   });
   const router = useRouter();
 
@@ -110,7 +111,7 @@ export const InventoryDashboard = () => {
   const handleDeleteConfirm = async (item: InventoryItem) => {
     setIsDeleting(true);
     try {
-      const response = await deleteInventoryItem(item.ID);
+      const response = await deleteInventoryItem(item.ID, userData.session_token);
       console.log(response);
       setIsDeleteModalOpen(false);
       setItemToDelete(null);

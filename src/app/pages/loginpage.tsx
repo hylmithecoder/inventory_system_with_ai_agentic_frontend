@@ -29,7 +29,8 @@ export const LoginPage = () => {
           id: user.ID,
           created_at: user.created_at,
           username: user.username,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          session_token: user.session_token
         }),
       })
       const responseData = await response.json();

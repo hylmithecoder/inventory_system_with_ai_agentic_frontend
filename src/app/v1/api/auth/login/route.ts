@@ -4,7 +4,7 @@ import { signToken, createAuthCookie } from "@/lib/auth";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, isAdmin } = body;
+    const { username, isAdmin, session_token } = body;
 
     if (!username) {
       return NextResponse.json(
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Buat JWT token
-    const token = signToken({ username, isAdmin });
+    const token = signToken({ username, isAdmin, session_token });
     const cookie = createAuthCookie(token);
 
     const response = NextResponse.json(

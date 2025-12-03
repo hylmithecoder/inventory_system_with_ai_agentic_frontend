@@ -1,7 +1,7 @@
 // src/app/services/chatbotGemini.ts
 
 export async function sendMessageToGemini(message: string, apiKey: string) {
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey;
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
   const body = {
     contents: [{ parts: [{ text: message }] }]
   };
