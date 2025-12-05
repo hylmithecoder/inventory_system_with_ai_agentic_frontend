@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from 'react';
 import {Modal} from './ui/Modal';
 import {Input} from './ui/Input';

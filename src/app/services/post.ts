@@ -1,4 +1,4 @@
-import { BASE_URL, ApiResponse, InventoryItem, User, InventoryFormData } from "../globalvariables"
+import { BASE_URL, ApiResponse, HandlerRequestData, User, InventoryFormData } from "../globalvariables"
 
 export const postFormData = async (url: string, data: Record<string, any>) => {
   const formData = new FormData()
@@ -6,7 +6,6 @@ export const postFormData = async (url: string, data: Record<string, any>) => {
 
   const response = await fetch(url, { method: 'POST', body: formData });
   const text = await response.text();
-  console.log("Raw response:", text);
   try {
     return JSON.parse(text);
   } catch (e) {
@@ -44,7 +43,6 @@ export const addInventoryItem = async (item: InventoryFormData, createdBy: strin
 }
 
 export const updateInventoryItem = async (id: string, item: InventoryFormData, created_by: string): Promise<void> => {
-  // Simulating PUT via POST
   const response = await postFormData(`${BASE_URL}`, {
     ...item,
     id: id,
@@ -54,3 +52,21 @@ export const updateInventoryItem = async (id: string, item: InventoryFormData, c
 
   if (response.status !== 'success') throw new Error(response.message || 'Failed to update item')
 }
+
+export const handlerRequestSqlFromAi = async(data: HandlerRequestData) => {
+  const response = await postFormData(`${BASE_URL}handler_request/`, {
+    ...data
+  })
+
+  if (response.status !== 'success') throw new Error(response.message || 'Failed to update with ai reponse')
+}
+
+export const getAllInformDatabase = async(type: string, token: string) => {
+  const response = await postFormData(`${BASE_URL}get_allinform_database/`, {
+    type: type,
+    token: token
+  })
+
+  if (response.status !== 'success') throw new Error(response.message || 'Failed to get history chat')
+  return response
+} 

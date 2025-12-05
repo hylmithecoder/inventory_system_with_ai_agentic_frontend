@@ -26,7 +26,7 @@ export const InventoryDashboard = () => {
     token: "",
     session_token: ""
   });
-  const router = useRouter();
+  const router = useRouter();  
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,10 +61,9 @@ export const InventoryDashboard = () => {
   const getUser = async () => {
     const response = await getUserAuth() as any;
     setUserData(response.user);
-    console.log(response.user);
   };
 
-  const emptyTheForm = async () => {
+  const emptyTheForm = () => {
     setEditingItem({
       ID: "",
       created_at: "",
@@ -75,7 +74,7 @@ export const InventoryDashboard = () => {
     })
   }
 
-  const handleAddItem = async () => {
+  const handleAddItem = () => {
     emptyTheForm()
     setIsModalOpen(true)
   }
@@ -97,13 +96,13 @@ export const InventoryDashboard = () => {
     }
   }
 
-  const handleEditItem = async (item: InventoryItem) => {
+  const handleEditItem = (item: InventoryItem) => {
     console.log(item);
     setEditingItem(item);
     setIsModalOpen(true);
   }
 
-  const handleDeleteItem = async (item: InventoryItem) => {
+  const handleDeleteItem = (item: InventoryItem) => {
     setItemToDelete(item);
     setIsDeleteModalOpen(true);
   }
@@ -196,10 +195,10 @@ export const InventoryDashboard = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900">Daftar Inventory</h2>
             {/* Simple mock filter buttons for visual completeness */}
-            <div className="hidden sm:flex space-x-2">
+            {/* <div className="hidden sm:flex space-x-2">
               <button className="px-3 py-1.5 text-xs font-medium bg-slate-800 text-white rounded-md shadow-sm">Semua</button>
               <button className="px-3 py-1.5 text-xs font-medium bg-white text-slate-600 border border-slate-200 rounded-md hover:bg-slate-50">Stok Rendah</button>
-            </div>
+            </div> */}
           </div>
           {error ? (
             <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex items-center gap-4 text-red-800">
@@ -239,7 +238,7 @@ export const InventoryDashboard = () => {
         itemToDelete={itemToDelete}
         isLoading={isDeleting}
       />
-      <ChatbotSidebar />
+      <ChatbotSidebar token={userData.session_token} onLoadData={loadData}/>
     </div>
   );
 };

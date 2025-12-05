@@ -77,9 +77,9 @@ export const InventoryTable = ({ items, onEdit, onDelete }: InventoryTableProps)
               <tr key={item.ID} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-slate-900">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs">
+                    {/* <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs">
                       {item.name.charAt(0).toUpperCase()}
-                    </div>
+                    </div> */}
                     {item.name}
                   </div>
                 </td>
