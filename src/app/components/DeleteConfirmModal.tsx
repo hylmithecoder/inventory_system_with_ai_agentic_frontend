@@ -35,8 +35,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         <div className="flex gap-3 items-start">
           <div className="flex-1">
             <p className="text-slate-700">
-              Apakah Anda yakin ingin menghapus barang{' '}
-              <span className="font-semibold text-slate-900">"{itemToDelete?.name}"</span>?
+              Apakah Anda yakin ingin menghapus {' '}
+              <span className="font-semibold text-slate-900">{itemToDelete?.name}</span>?
             </p>
             <p className="text-slate-500 text-sm mt-2">
               Tindakan ini tidak dapat dibatalkan dan data akan dihapus secara permanen dari sistem.
