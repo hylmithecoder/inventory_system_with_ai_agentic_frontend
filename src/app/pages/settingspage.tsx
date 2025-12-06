@@ -143,9 +143,8 @@ const SettingsPage = () => {
                   {userData?.username?.charAt(0).toUpperCase() || 'A'}
                 </div>
                 <div>
-                  <p className="text-lg font-semibold">{userData?.username ?? userData?.username ?? 'Pengguna'}</p>
+                  <p className="text-lg font-semibold">{userData?.username ?? 'Pengguna'}</p>
                   <p className="text-sm text-slate-500">{userData?.email ?? 'Belum ada email'}</p>
-                </div>
               </div>
             </aside>
 
