@@ -39,8 +39,8 @@ export const ChatbotSidebar = ({ token, onLoadData }: ChatBotProps) => {
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const sidebarHeaderRef = useRef<HTMLDivElement>(null);
-
+  const sidebarHeaderRef = useRef(null);
+  
   const [historyChat, setHistoryChat] = useState([]) as any
   const STORAGE_KEY = 'chatbot_sidebar_is_open'
 
@@ -263,17 +263,32 @@ export const ChatbotSidebar = ({ token, onLoadData }: ChatBotProps) => {
 
   return (
     <>
-      <div
-        ref={sidebarRef}
-        className="fixed right-0 top-0 h-full bg-white border-l border-slate-200 shadow-lg flex flex-col transition-all z-40 justify-between"
-        style={{ width: 64 }}
-      >
-        <div className={`border-b border-slate-100 flex items-center h-14 gap-3 ${isOpen ? "px-3 justify-between": "px-1 justify-center"}`}>
-          <button
-            onClick={() => setIsOpen(prev => !prev)}
-            aria-expanded={isOpen}
-            title={isOpen ? 'Tutup Chatbot' : 'Buka Chatbot'}
-            className="w-10 h-10 rounded-md bg-indigo-600 flex items-center justify-center text-white font-semibold shadow focus:outline-none focus:ring-2 focus:ring-indigo-300"
+    <div
+      ref={sidebarRef}
+      className="fixed right-0 top-0 h-full bg-white border-l border-slate-200 shadow-lg flex flex-col transition-all z-40 justify-between"
+      style={{ width: 56 }}
+    >
+      <div className="flex items-center justify-center h-14 gap-3">
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          className="text-indigo-600 cursor-default"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+          <text
+            x="12"
+            y="16"
+            textAnchor="middle"
+            fontSize="10"
+            fill="currentColor"
           >
             AI
           </button>
@@ -325,8 +340,7 @@ export const ChatbotSidebar = ({ token, onLoadData }: ChatBotProps) => {
               </div>
             </div>
           </div>
-        )}
-      </div>
+    </div>
       {ModalConfirm()}
     </>
   );
