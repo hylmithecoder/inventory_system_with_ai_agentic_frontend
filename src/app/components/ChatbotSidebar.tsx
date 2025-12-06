@@ -18,57 +18,24 @@ interface ChatBotProps {
 export const ChatbotSidebar = ({token, onLoadData}: ChatBotProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
-    { role: "", content: "" }
-  ])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const sidebarRef = useRef<HTMLDivElement>(null)
-  const [historyChat, setHistoryChat] = useState([]) as any
-  const [tableModel, setTableModel] = useState([]) as any[]
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [formData, setFormData] = useState<HandlerRequestData>({
-    action: "ask_ai",
-    request: "",
-    response: "",
-    sql_script: "",
-    token: ""
-  })
-
-  const getHistoryChat = async() => {
-    if (messages.length >= 2) {
-      return
-    }
-
-    const reponse = await getAllInformDatabase("history_chat", token)
-
-    setHistoryChat(reponse.data)
-
-    for (let i = 0; i < historyChat.length; i++) {
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { role: "user", content: historyChat[i].request }
-      ]);
-
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { role: "bot", content: historyChat[i].response }
-      ]);
-    }
-  }
-
-  const getTableModel = async() => {
-    if (messages.length >= 2) {
-      return
-    }
-    const response = await getAllInformDatabase("tables", token)
-
-    setTableModel(response)
-  }
+    {
+      role: "bot",
+      content: "Halo! Saya Chatbot Inventory. Ada yang bisa dibantu?",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const sidebarHeaderRef = useRef(null);
 
   useEffect(() => {
     if (sidebarRef.current) {
       if (isOpen) {
-        gsap.to(sidebarRef.current, { width: 320, duration: 0.3, ease: "power2.out" })
+        gsap.to(sidebarRef.current, {
+          width: 360,
+          duration: 0.3,
+          ease: "power2.out",
+        });
       } else {
         gsap.to(sidebarRef.current, { width: 56, duration: 0.3, ease: "power2.out" })
       }
@@ -183,20 +150,20 @@ export const ChatbotSidebar = ({token, onLoadData}: ChatBotProps) => {
   };
 
   return (
+    <>
+    {/* <div>tes</div> */}
     <div
       ref={sidebarRef}
-      className="fixed right-0 top-0 h-full bg-white border-l border-slate-200 shadow-lg flex flex-col transition-all z-40"
+      className="fixed right-0 top-0 h-full bg-white border-l border-slate-200 shadow-lg flex flex-col transition-all z-40 justify-between"
       style={{ width: 56 }}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
     >
-      <div className="flex items-center justify-center h-14">
+      <div className="flex items-center justify-center h-14 gap-3">
         <svg
           width="32"
           height="32"
           viewBox="0 0 24 24"
           fill="none"
-          className="text-blue-600"
+          className="text-indigo-600 cursor-default"
         >
           <circle
             cx="12"
@@ -215,47 +182,59 @@ export const ChatbotSidebar = ({token, onLoadData}: ChatBotProps) => {
             AI
           </text>
         </svg>
+        {isOpen && (
+        <h2 ref={sidebarHeaderRef} className="font-boldtext-lg text-indigo-600 cursor-default">
+            Inventory Chatbot
+        </h2>)}
       </div>
       {isOpen && (
-      <div className="flex flex-col h-full p-4 pt-0 min-w-[264px]">
-        <h2 className="font-bold text-lg mb-2 text-blue-700">Chatbot Support</h2>
-
-        {/* Chat area scrollable */}
-        <div className="flex-1 overflow-y-auto mb-2 border rounded p-2 bg-white">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`mb-2 ${
-                msg.role === "bot" ? "text-blue-700" : "text-slate-800 text-right"
-              }`}
-            >
-              <span>{msg.content}</span>
+        <div className="flex-1 flex flex-col p-4 pt-0 overflow-auto z-40" style={{ minWidth: 320 }}>
+          <h2 className="font-bold text-lg mb-2 text-blue-700">
+            Inventory Chatbot
+          </h2>
+          <div className="flex-1 overflow-y-auto mb-2">
+            {messages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`flex mb-2 p-1 ${
+                  msg.role === "bot" ? "justify-start" : "justify-end"
+                }`}
+              >
+                <div
+                  className={`p-3 ${
+                    msg.role === "bot"
+                      ? "text-blue-700 bg-slate-200 rounded-r-2xl rounded-tl-2xl max-w-[80%]"
+                      : "text-slate-800 bg-blue-100 rounded-l-2xl rounded-tr-2xl max-w-[80%]"
+                  }`}
+                >
+                  <span>{msg.content}</span>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="text-blue-400 text-sm">AI sedang mengetik...</div>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <input
+              className="flex-1 border-0 bg-gray-100 rounded px-2 py-1 w-0 h-10 focus:outline-none"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Tulis pesan..."
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              disabled={isLoading}
+            />
+              <button
+                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                onClick={sendMessage}
+                disabled={isLoading}
+              >
+                Kirim
+              </button>
             </div>
-          ))}
-          {isLoading && (
-            <div className="text-blue-400 text-sm">AI sedang mengetik...</div>
-          )}
-        </div>
-
-        {/* Input bar tetap di bawah */}
-        <div className="flex gap-2 border-t pt-2 bg-white">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            className="flex-1 border rounded px-2 py-1"
-          />
-          <button
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition flex items-center justify-center"
-            onClick={sendMessage}
-            disabled={isLoading}
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    )}
-    {ModalConfirm()}
+          </div>
+        )}
+        <div className="fixed bottom-24 right-24 bg-indigo-600 text-white w-10 z-10">tes</div>
     </div>
-  )
-}
+  );
+};
