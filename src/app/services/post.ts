@@ -1,4 +1,4 @@
-import { BASE_URL, ApiResponse, HandlerRequestData, User, InventoryFormData } from "../globalvariables"
+import { BASE_URL, ApiResponse, HandlerRequestData, User, InventoryFormData } from "../globalvariables";
 
 export const postFormData = async (url: string, data: Record<string, any>) => {
   const formData = new FormData()
@@ -53,7 +53,7 @@ export const updateInventoryItem = async (id: string, item: InventoryFormData, c
   if (response.status !== 'success') throw new Error(response.message || 'Failed to update item')
 }
 
-export const handlerRequestSqlFromAi = async(data: HandlerRequestData) => {
+export const handlerRequestSqlFromAi = async (data: HandlerRequestData) => {
   const response = await postFormData(`${BASE_URL}handler_request/`, {
     ...data
   })
@@ -61,7 +61,7 @@ export const handlerRequestSqlFromAi = async(data: HandlerRequestData) => {
   if (response.status !== 'success') throw new Error(response.message || 'Failed to update with ai reponse')
 }
 
-export const getAllInformDatabase = async(type: string, token: string) => {
+export const getAllInformDatabase = async (type: string, token: string) => {
   const response = await postFormData(`${BASE_URL}get_allinform_database/`, {
     type: type,
     token: token
@@ -69,4 +69,29 @@ export const getAllInformDatabase = async(type: string, token: string) => {
 
   if (response.status !== 'success') throw new Error(response.message || 'Failed to get history chat')
   return response
-} 
+}
+
+// Update user password using the accounts endpoint supporting _method=PUT
+export const updateUserPassword = async (
+  currentUsername: string,
+  currentPassword: string,
+  newPassword: string,
+  newUsername?: string
+) => {
+  // PHP expects current_username, current_password, new_password and optional username (new)
+  const payload: Record<string, any> = {
+    current_username: currentUsername,
+    current_password: currentPassword,
+    new_password: newPassword,
+    _method: 'PUT'
+  }
+
+  if (newUsername && newUsername.trim() !== "") {
+    payload.username = newUsername.trim();
+  }
+
+  const response = await postFormData(`${BASE_URL}accounts/`, payload)
+
+  if (response.status !== 'success') throw new Error(response.message || 'Failed to update password')
+  return response
+}
