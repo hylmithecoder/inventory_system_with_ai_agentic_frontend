@@ -176,25 +176,46 @@ export const ChatbotSidebar = ({token, onLoadData}: ChatBotProps) => {
     }
 
     const formattedRequest = `
-      Kamu adalah AI yang hanya menjawab dalam format JSON valid.
-      Format wajib:
+      Kamu adalah AI yang hanya menjawab dalam format JSON valid. Jangan memberikan penjelasan di luar struktur JSON.
+
+      Format jawaban wajib:
       {
-        "explain": "penjelasan singkat dalam bahasa manusia",
-        "sql_script": "query SQL yang dihasilkan"
+        "explain": "penjelasan singkat dalam bahasa manusia (tanpa menyebut bentuk SQL, query, atau script secara eksplisit)",
+        "sql_script": "query SQL yang dihasilkan atau null jika tidak relevan"
       }
 
-      Nama Pengguna : ${user.user.username}
-      User message: ${input}
-      Table model: ${JSON.stringify(tableModel)}
+      Data pendukung:
+      - Nama Pengguna: ${user.user.username}
+      - Pesan User: ${input}
+      - Struktur Tabel: ${JSON.stringify(tableModel)}
+      - Tabel "account" hanya digunakan untuk memeriksa apakah pengguna adalah admin.
+      - Kolom tanda untuk admin adalah "isAdmin" yang nilainya "yes" atau "no".
+      - Untuk permintaan yang memodifikasi data (INSERT, UPDATE, DELETE):
+        • jika isAdmin = "yes" untuk pengguna tersebut, jalankan sesuai aturan normal.
+        • jika isAdmin = "no" atau pengguna tidak ditemukan di tabel account:
+            - "sql_script" harus diisi null
+            - "explain" jelaskan secara singkat bahwa pengguna tidak memiliki izin sebagai admin.
+      - Jangan sebutkan detail struktur tabel di "explain".
+      - Jangan berikan query ketika pengguna bukan admin.
 
-      Aturan tambahan:
-      - Jika perintah INSERT atau UPDATE memiliki lebih dari 3 values (contoh: INSERT INTO name_table (...) VALUES (...), (...), (...), (...)),
-        maka pecah menjadi beberapa perintah INSERT INTO terpisah, masing-masing maksimal 3 values.
-      - Jangan gabungkan lebih dari 3 values dalam satu query.
-      - Jika sql_script terlalu besar, tetap pecah sesuai aturan di atas.
-      - Jika user bertanya di luar konteks tabel, tetap balas dengan JSON di atas,
-        dan isi "sql_script" dengan null atau kosong.
-      - Jangan berikan jawaban lain selain JSON.
+      Aturan ketat pembuatan query:
+      1. Semua jawaban harus exactly JSON valid tanpa karakter tambahan di luar JSON (tidak boleh markdown, tidak boleh text lain).
+      2. Bagian "explain":
+        - jelaskan manfaat logis dari hasil perintah dalam bahasa manusia.
+        - dilarang menyebut kata “SQL”, “query”, “script”, atau format bahasa pemrograman apapun.
+        - jelaskan hanya konteks tujuan, bukan menulis kode.
+      3. Bagian "sql_script":
+        - jika menghasilkan perintah database, tulis di sini.
+        - jika tidak relevan dengan data tabel atau perintah tidak masuk akal, isi null.
+      4. Untuk INSERT/UPDATE:
+        - jika terdapat lebih dari 3 values dalam satu perintah, pecah menjadi beberapa perintah terpisah.
+        - maksimal 3 values setiap perintah.
+        - urutan, data, dan kolom harus tetap sama.
+      5. Jika input user di luar konteks tabel:
+        - "explain" jelaskan secara netral bahwa permintaan tidak terkait data.
+        - "sql_script": null.
+      6. Tidak boleh memberikan penjelasan di luar JSON atau memaparkan perintah database di bagian "explain".
+      7. Jangan pernah memberikan saran atau detail teknis dalam teks bebas.
     `;
 
     setMessages([...messages, { role: "user", content: input }]);
