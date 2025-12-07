@@ -26,7 +26,7 @@ export const InventoryDashboard = () => {
     token: "",
     session_token: ""
   });
-  const router = useRouter();  
+  const router = useRouter();
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +39,7 @@ export const InventoryDashboard = () => {
     created_by: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Delete Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
@@ -60,10 +60,9 @@ export const InventoryDashboard = () => {
   };
 
   const getUser = async () => {
-    const response = await getUserAuth() as any;
-    console.log(response.user)
-    setUserData(response.user)
-    return response.user.username
+    const response = await getUserAuth();
+    if (response && 'user' in response) setUserData(response.user as User);
+    else if (response) setUserData(response as User);
   };
 
   const emptyTheForm = () => {
@@ -247,7 +246,7 @@ export const InventoryDashboard = () => {
         itemToDelete={itemToDelete}
         isLoading={isDeleting}
       />
-      <ChatbotSidebar token={userData.session_token} onLoadData={() => loadData(userData.username)}/>
+      <ChatbotSidebar token={userData.session_token} onLoadData={loadData} />
     </div>
   );
 };

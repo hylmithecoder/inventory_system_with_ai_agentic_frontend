@@ -1,8 +1,11 @@
 import { BASE_URL, ApiResponse, HandlerRequestData, User, InventoryFormData } from "../globalvariables";
 
-export const postFormData = async (url: string, data: Record<string, any>) => {
+export const postFormData = async (url: string, data: Record<string, unknown>) => {
   const formData = new FormData()
-  Object.keys(data).forEach(key => formData.append(key, data[key]))
+  Object.keys(data).forEach(key => {
+    const value = data[key]
+    formData.append(key, value === undefined || value === null ? '' : String(value))
+  })
 
   const response = await fetch(url, { method: 'POST', body: formData });
   const text = await response.text();
@@ -79,7 +82,7 @@ export const updateUserPassword = async (
   newUsername?: string
 ) => {
   // PHP expects current_username, current_password, new_password and optional username (new)
-  const payload: Record<string, any> = {
+  const payload: Record<string, unknown> = {
     current_username: currentUsername,
     current_password: currentPassword,
     new_password: newPassword,

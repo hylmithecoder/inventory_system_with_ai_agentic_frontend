@@ -3,8 +3,8 @@ import { BASE_URL } from '../globalvariables';
 
 export const fetchInventoryData = async (user: string): Promise<InventoryItem[]> => {
   try {
-    const response = await fetch(`${BASE_URL}?user=${user}`);
-    
+    const response = await fetch(BASE_URL);
+
     if (!response.ok) {
       throw new Error(`API Error: ${response.status}`);
     }
@@ -20,7 +20,7 @@ export const fetchInventoryData = async (user: string): Promise<InventoryItem[]>
     } else if (json.data) {
       return [json.data];
     }
-    
+
     return [];
   } catch (error) {
     console.error("Failed to fetch inventory:", error);
@@ -28,8 +28,9 @@ export const fetchInventoryData = async (user: string): Promise<InventoryItem[]>
   }
 };
 
-export const getUserAuth = async () => {
-    const response = await fetch("/v1/api/auth/me");
-    const data = await response.json();
-    return data;
+export const getUserAuth = async (): Promise<{ user?: User } | User | null> => {
+  const response = await fetch("/v1/api/auth/me");
+  if (!response.ok) return null;
+  const data = await response.json();
+  return data as { user?: User } | User;
 }

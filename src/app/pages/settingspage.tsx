@@ -23,20 +23,25 @@ const SettingsPage = () => {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const toastRef = useRef<HTMLDivElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
-  const toastTl = useRef<any>(null);
+  const toastTl = useRef<unknown>(null);
   const router = useRouter();
 
   useEffect(() => {
     let mounted = true;
-    getUserAuth()
-      .then((data) => {
+    (async () => {
+      try {
+        const data = await getUserAuth();
         if (!mounted) return;
-        if (data && (data.user || data.email || data.name)) {
-          setUserData(data.user ?? null);
-        }
-      })
-      .catch((err) => console.error("Failed to load user:", err))
-      .finally(() => setLoading(false));
+        if (data && 'user' in data) setUserData(data.user as User);
+        else if (data) setUserData(data as User);
+      } catch (error) {
+
+        console.error("Failed to load user:", error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+
     return () => {
       mounted = false;
     };
@@ -45,12 +50,10 @@ const SettingsPage = () => {
   // Modal animation with GSAP (dynamic import). If GSAP is not available, we fall back to simple CSS.
   useEffect(() => {
     if (!isModalOpen || !modalRef.current) return;
-    let ctx: any = null;
-    let gsap: any = null;
     (async () => {
       try {
-        gsap = (await import('gsap')).gsap;
-        gsap.fromTo(modalRef.current, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+        const mod = await import('gsap');
+        mod.gsap.fromTo(modalRef.current, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' });
       } catch (e) {
         // fallback: simple CSS transition by setting style
         if (modalRef.current) {
@@ -61,8 +64,11 @@ const SettingsPage = () => {
     })();
 
     return () => {
-      try { if (gsap && modalRef.current) gsap.to(modalRef.current, { autoAlpha: 0, y: 10, duration: 0.2 }); } catch (e) { }
-      ctx = null;
+      // cleanup: use CSS fallback to hide modal gracefully
+      if (modalRef.current) {
+        modalRef.current.style.opacity = '0';
+        modalRef.current.style.transform = 'translateY(10px)';
+      }
     };
   }, [isModalOpen]);
 
@@ -83,7 +89,7 @@ const SettingsPage = () => {
         toastTl.current.to(toastRef.current, { autoAlpha: 1, y: 0, duration: 0.25 });
         toastTl.current.to(progressRef.current, { width: '0%', duration: 5, ease: 'linear' });
         toastTl.current.to(toastRef.current, { autoAlpha: 0, y: -10, duration: 0.25 });
-      } catch (e) {
+      } catch (_e) {
         // fallback: CSS transition
         if (toastRef.current && progressRef.current) {
           toastRef.current.style.opacity = '1';
@@ -104,7 +110,13 @@ const SettingsPage = () => {
 
     return () => {
       cancelled = true;
-      try { toastTl.current?.kill(); } catch (e) { }
+      try {
+        // toastTl is unknown; try kill if available
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (toastTl.current as any)?.kill?.();
+      } catch (_err) {
+        // ignore
+      }
     };
   }, [toast]);
 
@@ -144,7 +156,7 @@ const SettingsPage = () => {
                 </div>
                 <div>
                   <p className="text-lg font-semibold">{userData?.username ?? 'Pengguna'}</p>
-              </div>
+                </div>
               </div>
             </aside>
 
@@ -229,10 +241,13 @@ const SettingsPage = () => {
                             setChangeUsername('');
                             setShowWarningConfirm(false);
                             setIsModalOpen(false);
-                          } catch (err: any) {
+                          } catch (err: unknown) {
+                            // capture error message safely
+
                             console.error(err);
-                            setPasswordMessage(err?.message || 'Gagal mengupdate password');
-                            setToast({ type: 'error', text: err?.message || 'Gagal mengupdate password' });
+                            const msg = err instanceof Error ? err.message : String(err ?? 'Gagal mengupdate password');
+                            setPasswordMessage(msg || 'Gagal mengupdate password');
+                            setToast({ type: 'error', text: msg || 'Gagal mengupdate password' });
                           } finally {
                             setIsSubmittingPassword(false);
                           }

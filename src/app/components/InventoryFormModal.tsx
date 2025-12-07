@@ -1,8 +1,8 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import {Modal} from './ui/Modal';
-import {Input} from './ui/Input';
-import {Button} from './ui/Button';
+import { Modal } from './ui/Modal';
+import { Input } from './ui/Input';
+import { Button } from './ui/Button';
 import { InventoryItem, InventoryFormData } from '../globalvariables';
 
 interface InventoryFormModalProps {
@@ -13,12 +13,12 @@ interface InventoryFormModalProps {
   isLoading?: boolean;
 }
 
-export const InventoryFormModal: React.FC<InventoryFormModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
+export const InventoryFormModal: React.FC<InventoryFormModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
   initialData,
-  isLoading 
+  isLoading
 }) => {
   const [formData, setFormData] = useState<InventoryFormData>({
     name: '',
@@ -27,15 +27,20 @@ export const InventoryFormModal: React.FC<InventoryFormModalProps> = ({
   });
 
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name,
-        stock: initialData.stock,
-        price: initialData.price
-      });
-    } else {
-      setFormData({ name: '', stock: '', price: '' });
-    }
+    // Defer the state update to avoid synchronous setState inside effect
+    const timer = setTimeout(() => {
+      if (initialData) {
+        setFormData({
+          name: initialData.name,
+          stock: initialData.stock,
+          price: initialData.price
+        });
+      } else {
+        setFormData({ name: '', stock: '', price: '' });
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [initialData, isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,9 +54,9 @@ export const InventoryFormModal: React.FC<InventoryFormModalProps> = ({
   };
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
       title={initialData ? "Edit Barang" : "Tambah Barang Baru"}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -64,7 +69,7 @@ export const InventoryFormModal: React.FC<InventoryFormModalProps> = ({
           required
         />
         <div className="grid grid-cols-2 gap-4">
-            <Input
+          <Input
             label="Stok"
             name="stock"
             type="number"
@@ -84,7 +89,7 @@ export const InventoryFormModal: React.FC<InventoryFormModalProps> = ({
           />
         </div>
 
-         <div className="pt-4 flex justify-end gap-3">
+        <div className="pt-4 flex justify-end gap-3">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
             Batal
           </Button>

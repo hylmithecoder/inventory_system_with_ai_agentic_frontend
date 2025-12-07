@@ -36,7 +36,7 @@ export const LoginPage = () => {
       const responseData = await response.json();
       console.log(responseData);
       route.push('/dashboard/home');
-    } catch (err: any) {
+    } catch (_err: unknown) {
       setError('Login gagal. Periksa username dan password anda.');
     } finally {
       setIsLoading(false);
