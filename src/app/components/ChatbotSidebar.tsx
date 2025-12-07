@@ -224,7 +224,12 @@ export const ChatbotSidebar = ({token, onLoadData}: ChatBotProps) => {
         sql_script: parsed.sql_script,
         token: token
       })
-      setIsModalOpen(true)
+
+      if (parsed.sql_script) {
+        setIsModalOpen(true)
+      } else {
+        executeWithAI(formData);
+      }
     } catch (err) {
       setMessages((msgs) => [
         ...msgs,
