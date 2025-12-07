@@ -1,7 +1,7 @@
 import { ApiResponse, InventoryItem, User } from '../globalvariables';
 import { BASE_URL } from '../globalvariables';
 
-export const fetchInventoryData = async (): Promise<InventoryItem[]> => {
+export const fetchInventoryData = async (user: string): Promise<InventoryItem[]> => {
   try {
     const response = await fetch(BASE_URL);
 

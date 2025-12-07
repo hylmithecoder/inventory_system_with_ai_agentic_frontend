@@ -45,11 +45,12 @@ export const InventoryDashboard = () => {
   const [itemToDelete, setItemToDelete] = useState<InventoryItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const loadData = async () => {
+  const loadData = async (username: string) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchInventoryData();
+      console.log(username)
+      const data = await fetchInventoryData(username);
       setItems(data);
     } catch (err) {
       setError('Gagal menghubungkan ke server lokal (localhost). Pastikan API berjalan.');
@@ -89,7 +90,8 @@ export const InventoryDashboard = () => {
         await addInventoryItem(formData, userData?.username || 'admin');
       }
       setIsModalOpen(false);
-      loadData(); // Refresh list
+      const user = await getUser();
+      loadData(user); // Refresh list
     } catch (e) {
       alert("Operasi gagal: " + e);
     } finally {
@@ -115,7 +117,8 @@ export const InventoryDashboard = () => {
       console.log(response);
       setIsDeleteModalOpen(false);
       setItemToDelete(null);
-      loadData(); // Refresh list
+      const user = await getUser()
+      loadData(user); // Refresh list
     } catch (e) {
       alert("Operasi gagal: " + e);
     } finally {
@@ -124,8 +127,12 @@ export const InventoryDashboard = () => {
   }
 
   useEffect(() => {
-    getUser();
-    loadData();
+    getUserAuth()
+    .then((response) => {
+      setUserData(response.user);
+      const user = response.user;
+      loadData(user.username);
+    })
   }, []);
 
   const handleLogout = async () => {
@@ -159,7 +166,7 @@ export const InventoryDashboard = () => {
           <div className="flex items-center gap-3">
             <Button
               variant="secondary"
-              onClick={loadData}
+              onClick={()=> loadData(userData.username)}
               disabled={loading}
               className="hidden sm:flex"
             >
@@ -208,7 +215,7 @@ export const InventoryDashboard = () => {
                 <h3 className="font-semibold">Terjadi Kesalahan</h3>
                 <p className="text-sm mt-1 text-red-600">{error}</p>
               </div>
-              <button onClick={loadData} className="ml-auto px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50">
+              <button onClick={()=>loadData(userData.username)} className="ml-auto px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50">
                 Coba Lagi
               </button>
             </div>
